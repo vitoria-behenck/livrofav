@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>📚 Meus Livros Favoritos</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #fdfbfb, #ebedee);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      background-image: url("https://i.pinimg.com/originals/b5/dd/91/b5dd91713c6c38eee5f0c07edb92bb5c.jpg");
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    input {
+      flex: 1 1 45%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #fafafa;
+      margin-bottom: 12px;
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .book-info {
+      font-size: 16px;
+      color: #333;
+    }
+
+    .remove-btn {
+      background-color: #e74c3c;
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .remove-btn:hover {
+      background-color: #c0392b;
+    }
+
+    @media (max-width: 500px) {
+      input {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📖 Meus Livros Favoritos</h1>
+
+    <div class="form-group">
+      <!-- Campos de entrada -->
+      <input type="text" id="bookName" placeholder="Nome do livro">
+      <input type="text" id="bookAuthor" placeholder="Autor">
+      <button onclick="addBook()">Adicionar</button>
+    </div>
+
+    <!-- Lista de livros -->
+    <ul id="bookList"></ul>
+  </div>
+
+  <script>
+    // Ao carregar a página, mostra os livros salvos
+    window.onload = function () {
+      loadBooks();
+    };
+
+    // Função que carrega e exibe os livros salvos
+    function loadBooks() {
+      // Pega os livros salvos no navegador (ou cria lista vazia se não houver)
+      const books = JSON.parse(localStorage.getItem("favoriteBooks")) || [];
+
+      // Seleciona o elemento <ul> onde os livros serão exibidos
+      const bookList = document.getElementById("bookList");
+
+      // Limpa a lista antes de mostrar os livros
+      bookList.innerHTML = "";
+
+      // Percorre todos os livros salvos e cria elementos na tela
+      books.forEach((book, index) => {
+        // Cria um novo item da lista (li)
+        const li = document.createElement("li");
+
+        // Adiciona o nome e autor do livro + botão de remover
+        li.innerHTML = `
+          <span class="book-info"><strong>${book.name}</strong> - ${book.author}</span>
+          <button class="remove-btn" onclick="removeBook(${index})">Remover</button>
+        `;
+
+        // Adiciona o <li> dentro da lista (<ul>)
+        bookList.appendChild(li);
+      });
+    }
+
+    // Função que adiciona um novo livro à lista
+    function addBook() {
+      // Pega os campos de texto
+      const nameInput = document.getElementById("bookName");
+      const authorInput = document.getElementById("bookAuthor");
+
+      // Pega o conteúdo digitado, removendo espaços extras
+      const name = nameInput.value.trim();
+      const author = authorInput.value.trim();
+
+      // Se algum campo estiver vazio, avisa e para
+      if (name === "" || author === "") {
+        alert("Preencha o nome e o autor do livro.");
+        return;
+      }
+
+      // Pega os livros atuais salvos (ou lista vazia)
+      const books = JSON.parse(localStorage.getItem("favoriteBooks")) || [];
+
+      // Adiciona o novo livro ao array
+      books.push({ name, author });
+
+      // Salva a nova lista no localStorage (convertido em texto)
+      localStorage.setItem("favoriteBooks", JSON.stringify(books));
+
+      // Limpa os campos de entrada
+      nameInput.value = "";
+      authorInput.value = "";
+
+      // Atualiza a lista exibida
+      loadBooks();
+    }
+
+    // Função que remove um livro da lista
+    function removeBook(index) {
+      // Pega a lista de livros atual
+      const books = JSON.parse(localStorage.getItem("favoriteBooks")) || [];
+
+      // Remove 1 livro a partir da posição 'index'
+      books.splice(index, 1);
+
+      // Salva a nova lista no localStorage
+      localStorage.setItem("favoriteBooks", JSON.stringify(books));
+
+      // Atualiza a lista exibida
+      loadBooks();
+    }
+  </script>
+</body>
+</html>
