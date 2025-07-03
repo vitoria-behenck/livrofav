@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>📚 Meus Livros Favoritos</title>
   <style>
-    * {
+     *{
       box-sizing: border-box;
     }
 
@@ -113,94 +113,77 @@
     <h1>📖 Meus Livros Favoritos</h1>
 
     <div class="form-group">
-      <!-- Campos de entrada -->
       <input type="text" id="bookName" placeholder="Nome do livro">
       <input type="text" id="bookAuthor" placeholder="Autor">
-      <button onclick="addBook()">Adicionar</button>
+      <button id="addBookBtn">Adicionar</button>
     </div>
 
-    <!-- Lista de livros -->
     <ul id="bookList"></ul>
   </div>
 
   <script>
-    // Ao carregar a página, mostra os livros salvos
+    // Ao carregar a página, mostra os livros e adiciona o listener do botão "Adicionar"
     window.onload = function () {
       loadBooks();
+
+      // Adiciona um event listener ao botão de adicionar
+      const addBookBtn = document.getElementById("addBookBtn");
+      addBookBtn.addEventListener("click", addBook);
+
+      // Esse listener executa a função addBook() quando o usuário clica no botão "Adicionar"
     };
 
-    // Função que carrega e exibe os livros salvos
     function loadBooks() {
-      // Pega os livros salvos no navegador (ou cria lista vazia se não houver)
       const books = JSON.parse(localStorage.getItem("favoriteBooks")) || [];
-
-      // Seleciona o elemento <ul> onde os livros serão exibidos
       const bookList = document.getElementById("bookList");
-
-      // Limpa a lista antes de mostrar os livros
       bookList.innerHTML = "";
 
-      // Percorre todos os livros salvos e cria elementos na tela
       books.forEach((book, index) => {
-        // Cria um novo item da lista (li)
         const li = document.createElement("li");
-
-        // Adiciona o nome e autor do livro + botão de remover
         li.innerHTML = `
           <span class="book-info"><strong>${book.name}</strong> - ${book.author}</span>
-          <button class="remove-btn" onclick="removeBook(${index})">Remover</button>
+          <button class="remove-btn" data-index="${index}">Remover</button>
         `;
-
-        // Adiciona o <li> dentro da lista (<ul>)
         bookList.appendChild(li);
+      });
+
+      // Após adicionar os livros, adiciona os event listeners aos botões de remover
+      const removeButtons = document.querySelectorAll(".remove-btn");
+      removeButtons.forEach(button => {
+        button.addEventListener("click", function () {
+          const index = this.getAttribute("data-index");
+          removeBook(index);
+        });
+
+        // Comentário: Esse listener chama removeBook(index) ao clicar em "Remover",
+        // usando o atributo data-index para saber qual item apagar.
       });
     }
 
-    // Função que adiciona um novo livro à lista
     function addBook() {
-      // Pega os campos de texto
       const nameInput = document.getElementById("bookName");
       const authorInput = document.getElementById("bookAuthor");
-
-      // Pega o conteúdo digitado, removendo espaços extras
       const name = nameInput.value.trim();
       const author = authorInput.value.trim();
 
-      // Se algum campo estiver vazio, avisa e para
       if (name === "" || author === "") {
         alert("Preencha o nome e o autor do livro.");
         return;
       }
 
-      // Pega os livros atuais salvos (ou lista vazia)
       const books = JSON.parse(localStorage.getItem("favoriteBooks")) || [];
-
-      // Adiciona o novo livro ao array
       books.push({ name, author });
-
-      // Salva a nova lista no localStorage (convertido em texto)
       localStorage.setItem("favoriteBooks", JSON.stringify(books));
 
-      // Limpa os campos de entrada
       nameInput.value = "";
       authorInput.value = "";
-
-      // Atualiza a lista exibida
       loadBooks();
     }
 
-    // Função que remove um livro da lista
     function removeBook(index) {
-      // Pega a lista de livros atual
       const books = JSON.parse(localStorage.getItem("favoriteBooks")) || [];
-
-      // Remove 1 livro a partir da posição 'index'
       books.splice(index, 1);
-
-      // Salva a nova lista no localStorage
       localStorage.setItem("favoriteBooks", JSON.stringify(books));
-
-      // Atualiza a lista exibida
       loadBooks();
     }
   </script>
