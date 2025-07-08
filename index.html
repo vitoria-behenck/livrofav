@@ -2,37 +2,35 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>📚 Meus Livros Favoritos</title>
+  <title>📚 Minha Estante</title>
   <style>
-     *{
+    * {
       box-sizing: border-box;
     }
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #fdfbfb, #ebedee);
+      background-image: url("https://i.pinimg.com/originals/b5/dd/91/b5dd91713c6c38eee5f0c07edb92bb5c.jpg");
+      background-size: cover;
+      background-repeat: no-repeat;
       margin: 0;
       padding: 20px;
       display: flex;
       justify-content: center;
-      background-image: url("https://i.pinimg.com/originals/b5/dd/91/b5dd91713c6c38eee5f0c07edb92bb5c.jpg");
-      background-size: cover;
-      background-repeat: no-repeat;
     }
 
     .container {
       background: white;
       border-radius: 12px;
       padding: 30px;
-      max-width: 600px;
+      max-width: 700px;
       width: 100%;
       box-shadow: 0 8px 16px rgba(0,0,0,0.1);
     }
 
-    h1 {
+    h1, h2 {
       text-align: center;
       color: #333;
-      margin-bottom: 20px;
     }
 
     .form-group {
@@ -80,11 +78,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
     }
 
     .book-info {
-      font-size: 16px;
+      font-size: 15px;
       color: #333;
+      flex: 1 1 70%;
     }
 
     .remove-btn {
@@ -101,8 +101,28 @@
       background-color: #c0392b;
     }
 
+    .clear-btn {
+      background-color: #d35400;
+      border: none;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .clear-btn:hover {
+      background-color: #b84300;
+    }
+
     @media (max-width: 500px) {
       input {
+        flex: 1 1 100%;
+      }
+      .book-info {
         flex: 1 1 100%;
       }
     }
@@ -110,27 +130,30 @@
 </head>
 <body>
   <div class="container">
-    <h1>📖 Meus Livros Favoritos</h1>
+    <h1>📖 Adicionar Novo Livro</h1>
 
+    <!-- Formulário de Adição -->
     <div class="form-group">
       <input type="text" id="bookName" placeholder="Nome do livro">
       <input type="text" id="bookAuthor" placeholder="Autor">
+      <input type="text" id="bookGenre" placeholder="Gênero">
+      <input type="number" id="bookPages" placeholder="Páginas" min="1">
       <button id="addBookBtn">Adicionar</button>
     </div>
 
+    <hr style="margin: 30px 0;">
+
+    <!-- Estante de livros -->
+    <h2>📚 Minha Estante</h2>
     <ul id="bookList"></ul>
+    <button id="clearAllBtn" class="clear-btn">Limpar Tudo</button>
   </div>
 
   <script>
-    // Ao carregar a página, mostra os livros e adiciona o listener do botão "Adicionar"
     window.onload = function () {
       loadBooks();
-
-      // Adiciona um event listener ao botão de adicionar
-      const addBookBtn = document.getElementById("addBookBtn");
-      addBookBtn.addEventListener("click", addBook);
-
-      // Esse listener executa a função addBook() quando o usuário clica no botão "Adicionar"
+      document.getElementById("addBookBtn").addEventListener("click", addBook);
+      document.getElementById("clearAllBtn").addEventListener("click", clearAllBooks);
     };
 
     function loadBooks() {
@@ -141,42 +164,45 @@
       books.forEach((book, index) => {
         const li = document.createElement("li");
         li.innerHTML = `
-          <span class="book-info"><strong>${book.name}</strong> - ${book.author}</span>
+          <span class="book-info">
+            <strong>${book.name}</strong> — ${book.author} <br>
+            <em>${book.genre}</em> • ${book.pages} páginas
+          </span>
           <button class="remove-btn" data-index="${index}">Remover</button>
         `;
         bookList.appendChild(li);
       });
 
-      // Após adicionar os livros, adiciona os event listeners aos botões de remover
       const removeButtons = document.querySelectorAll(".remove-btn");
       removeButtons.forEach(button => {
         button.addEventListener("click", function () {
           const index = this.getAttribute("data-index");
           removeBook(index);
         });
-
-        // Comentário: Esse listener chama removeBook(index) ao clicar em "Remover",
-        // usando o atributo data-index para saber qual item apagar.
       });
     }
 
     function addBook() {
-      const nameInput = document.getElementById("bookName");
-      const authorInput = document.getElementById("bookAuthor");
-      const name = nameInput.value.trim();
-      const author = authorInput.value.trim();
+      const name = document.getElementById("bookName").value.trim();
+      const author = document.getElementById("bookAuthor").value.trim();
+      const genre = document.getElementById("bookGenre").value.trim();
+      const pages = parseInt(document.getElementById("bookPages").value.trim());
 
-      if (name === "" || author === "") {
-        alert("Preencha o nome e o autor do livro.");
+      if (!name || !author || !genre || isNaN(pages) || pages <= 0) {
+        alert("Preencha todos os campos corretamente.");
         return;
       }
 
       const books = JSON.parse(localStorage.getItem("favoriteBooks")) || [];
-      books.push({ name, author });
+      books.push({ name, author, genre, pages });
       localStorage.setItem("favoriteBooks", JSON.stringify(books));
 
-      nameInput.value = "";
-      authorInput.value = "";
+      // Limpa os campos
+      document.getElementById("bookName").value = "";
+      document.getElementById("bookAuthor").value = "";
+      document.getElementById("bookGenre").value = "";
+      document.getElementById("bookPages").value = "";
+
       loadBooks();
     }
 
@@ -185,6 +211,13 @@
       books.splice(index, 1);
       localStorage.setItem("favoriteBooks", JSON.stringify(books));
       loadBooks();
+    }
+
+    function clearAllBooks() {
+      if (confirm("Tem certeza que deseja remover todos os livros da estante?")) {
+        localStorage.removeItem("favoriteBooks");
+        loadBooks();
+      }
     }
   </script>
 </body>
