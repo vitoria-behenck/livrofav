@@ -277,13 +277,29 @@
     <button id="clearAllBtn" class="clear-btn">Limpar Tudo</button>
 
     <p id="bookCount" class="click-count">📚 Total de livros na estante: 0</p>
+
+    <button id="addcount" class="click-count">Aumentar Clicks!</button>
+    <p id="countClicks" class="click-count">Total de curtidas: </p>
+
+
   </div>
 
   <script>
+      let contador = 0;
+      const btnAddCount = document.getElementById("addcount");
+      let countClicks = document.getElementById("countClicks").innerHTML;
+      btnAddCount.addEventListener("click", somacont());
+
+      function somacont(){
+        console.log("acionou o contador");
+        contador++;
+        countClicks = counClicks + contador;
+      }
     window.onload = function () {
       loadBooks();
       updateBookCount();
       applySavedTheme();
+      updatecount();
 
       document.getElementById("addBookBtn").addEventListener("click", addBook);
       document.getElementById("clearAllBtn").addEventListener("click", clearAllBooks);
@@ -388,6 +404,7 @@
         themeToggle.checked = false;
       }
     }
+    
   </script>
 </body>
 </html>
